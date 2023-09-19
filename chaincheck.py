@@ -70,6 +70,32 @@ def search_by_accounts():
     
     conn.close()
 
+def show_last_10_blocks():
+    conn = sqlite3.connect("blockchainindex.db")
+    cursor = conn.cursor()
+    
+    cursor.execute("SELECT block_id, account, created_at FROM blocks ORDER BY block_id DESC LIMIT 10")
+    last_10_blocks = cursor.fetchall()
+    
+    print("\033[92mLast 10 Blocks:\033[0m")
+    for block in last_10_blocks:
+        print(f"  Block ID: {block[0]}, Miner: {block[1]}, Timestamp: {block[2]}")
+        
+    conn.close()
+
+def show_last_5_super_blocks():
+    conn = sqlite3.connect("blockchainindex.db")
+    cursor = conn.cursor()
+    
+    cursor.execute("SELECT block_id, account, created_at FROM blocks WHERE is_super_block = 1 ORDER BY block_id DESC LIMIT 5")
+    last_5_super_blocks = cursor.fetchall()
+    
+    print("\033[92mLast 5 Super Blocks:\033[0m")
+    for block in last_5_super_blocks:
+        print(f"  Block ID: {block[0]}, Miner: {block[1]}, Timestamp: {block[2]}")
+        
+    conn.close()
+
 def main_menu():
     while True:
         print("\033[93m")  # Set text to bright yellow
@@ -88,9 +114,9 @@ def main_menu():
         elif choice == '2':
             search_by_accounts()
         elif choice == '3':
-            pass  # To be implemented
+            show_last_10_blocks()
         elif choice == '4':
-            pass  # To be implemented
+            show_last_5_super_blocks()
         elif choice == '5':
             break
         else:
