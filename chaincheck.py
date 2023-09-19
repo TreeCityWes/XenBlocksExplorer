@@ -20,17 +20,19 @@ def search_by_block_id():
     conn = sqlite3.connect("blockchainindex.db")
     cursor = conn.cursor()
     
-    cursor.execute("SELECT block_id, account, created_at FROM blocks WHERE block_id = ?", (block_id,))
+    cursor.execute("SELECT block_id, account, created_at, is_super_block FROM blocks WHERE block_id = ?", (block_id,))
     result = cursor.fetchone()
     if result:
         print("\033[92m")  # Set text to bright green
         print(f"Block ID: {result[0]}")
         print(f"Miner: {result[1]}")
         print(f"Timestamp: {result[2]}")
+        print(f"Type: {'Super Block' if result[3] else 'Regular Block'}")
         print("\033[0m")  # Reset text color
     else:
         print("No block found with the given ID.")
     conn.close()
+
 
 def search_by_accounts():
     account = input("Enter the Account: ")
