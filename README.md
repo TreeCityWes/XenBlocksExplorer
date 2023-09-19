@@ -2,6 +2,8 @@
 
 XenBlocks Python Explorer is a simple yet powerful tool for exploring XenBlocks blockchain data. It consists of two main Python scripts: `indexer.py` and `chaincheck.py`.
 
+This requires syncnode with a synchronized blockchain.db. The indexer.py will index blockchain.db and create a readable blockchainindex.db. Once blockchainindex.db is populated and has good size, run chaincheck.py from the same directory to gather data. 
+
 
 
 ## Features
