@@ -22,9 +22,8 @@ This requires syncnode with a synchronized blockchain.db. The indexer.py will in
 
 Clone this repository to your local machine.
 
-\`\`\`
 git clone https://github.com/YourUsername/XenBlocks-Python-Explorer.git
-\`\`\`
+
 
 ## Usage
 
@@ -32,9 +31,7 @@ git clone https://github.com/YourUsername/XenBlocks-Python-Explorer.git
 
 Run the `indexer.py` script to build the index database (`blockchainindex.db`). Make sure you have `blockchain.db` (your blockchain data) available in the same directory.
 
-\`\`\`bash
 python indexer.py
-\`\`\`
 
 The script will continue running to index new blocks as they are added. Wait until the database is built before proceeding to the next step.
 
@@ -42,9 +39,8 @@ The script will continue running to index new blocks as they are added. Wait unt
 
 Once the index database is built, you can run the `chaincheck.py` script to explore the blockchain data.
 
-\`\`\`bash
 python chaincheck.py
-\`\`\`
+
 
 Follow the on-screen prompts to navigate through the blockchain data.
 
