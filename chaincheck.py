@@ -35,7 +35,7 @@ def search_by_block_id():
 
 
 def search_by_accounts():
-    account = input("Enter the Account: ")
+    account = input("Enter the Account: ").lower()
     conn = sqlite3.connect("blockchainindex.db")
     cursor = conn.cursor()
     
