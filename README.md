@@ -1,4 +1,4 @@
-# XenBlocks Python Explorer
+# XenBlocks Python Explorer and Chart Creator
 
 XenBlocks Python Explorer is a simple tool for exploring XenBlocks blockchain data. It consists of two main Python scripts: `indexer.py` and `chaincheck.py`.
 
