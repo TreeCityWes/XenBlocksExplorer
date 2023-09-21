@@ -11,7 +11,8 @@ This requires syncnode with a synchronized `blockchain.db`. The `indexer.py` wil
 - **Account Search**: Search for accounts and get detailed information including total blocks and total super blocks.
 - **Last 10 Blocks**: View the last 10 blocks in the blockchain.
 - **Last 5 Super Blocks**: View the last 5 super blocks in the blockchain.
-- **Data Visualization**: Visualize blockchain data with different charts.
+
+- NEW: **Data Visualization**: Visualize blockchain data with different charts with charts.py
 
 ## Prerequisites
 
