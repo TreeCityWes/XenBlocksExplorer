@@ -78,42 +78,45 @@ def main():
         df_filtered = df  # Modified line: No filtering is done here anymore
         
         if choice == '1':
-            total_blocks_df = df_filtered.groupby('created_at').size().reset_index(name='blocks')
+            # Assuming df is the original DataFrame
+            total_blocks_df = df[df['block_type'] != 'xuni'].groupby('created_at').size().reset_index(name='blocks')  # Exclude 'XUNI' blocks
             total_blocks_df['cumulative_blocks'] = total_blocks_df['blocks'].cumsum()
             plot_data(total_blocks_df, 'Total Network Blocks Over Time')
+
                 
         elif choice == '2':
-            superblocks_df = df[df['is_super_block'] == 1].groupby('created_at').size().reset_index(name='blocks')
+            superblocks_df = df[df['block_type'] == 'super'].groupby('created_at').size().reset_index(name='blocks')
             superblocks_df['cumulative_blocks'] = superblocks_df['blocks'].cumsum()
             plot_data(superblocks_df, 'Total Network Super Blocks Over Time')
 
+
         elif choice == '3':
-            xuni_blocks_df = df[df['is_xuni_block'] == 1].groupby('created_at').size().reset_index(name='blocks')
+            xuni_blocks_df = df[df['block_type'] == 'xuni'].groupby('created_at').size().reset_index(name='blocks')
             xuni_blocks_df['cumulative_blocks'] = xuni_blocks_df['blocks'].cumsum()
             plot_data(xuni_blocks_df, 'Total Network XUNI Blocks Over Time')
 
+
         elif choice == '4':
-            block_counts = df_filtered['is_super_block'].value_counts()
-            xuni_block_count = df_filtered['is_xuni_block'].sum()
+            block_counts = df['block_type'].value_counts()
+            regular_block_count = block_counts.get('regular', 0)
+            super_block_count = block_counts.get('super', 0)
+            xuni_block_count = block_counts.get('xuni', 0)
             
-            # Calculate the percentages
-            total_blocks = block_counts.get(0, 0) + block_counts.get(1, 0) + xuni_block_count
-            block_percentage = (block_counts.get(0, 0) / total_blocks) * 100
-            superblock_percentage = (block_counts.get(1, 0) / total_blocks) * 100
-            xuni_block_percentage = (xuni_block_count / total_blocks) * 100
+            # If XUNI blocks are not counted in total blocks
+            total_blocks = regular_block_count + super_block_count  # XUNI blocks are not included in total_blocks
+            regular_block_percentage = (regular_block_count / total_blocks) * 100
+            super_block_percentage = (super_block_count / total_blocks) * 100
             
-            # Create the pie chart without labels
-            plt.pie([block_counts.get(0, 0), xuni_block_count, block_counts.get(1, 0)],
-                    labels=['', '', ''], autopct='',
-                    startangle=140, colors=['#66b3ff', '#ffcc99', '#99ff99'])
+            plt.pie([regular_block_count, super_block_count],
+                    labels=['', ''], autopct='',
+                    startangle=140, colors=['#66b3ff', '#99ff99'])
             plt.axis('equal')
-            plt.title('Ratio of Blocks, XUNI Blocks, and Superblocks', fontsize=16, loc='center')
-            legend_labels = [f'Blocks - {block_percentage:.1f}%', f'XUNI Blocks - {xuni_block_percentage:.1f}%', f'Superblocks - {superblock_percentage:.1f}%']
+            plt.title('Ratio of Blocks and Superblocks', fontsize=16, loc='center')
+            legend_labels = [f'Regular Blocks - {regular_block_percentage:.1f}%', f'Superblocks - {super_block_percentage:.1f}%']
             legend = plt.legend(loc='upper left', labels=legend_labels)
             legend.get_frame().set_alpha(1.0)
             
             plt.show()
-
 
         elif choice == '5':
             account_name = input("Enter the account name: ").lower()
@@ -123,20 +126,17 @@ def main():
         
         elif choice == '6':
             account_name = input("Enter the account name: ").lower()
-            xuni_account_blocks_df = df_filtered[(df_filtered['account'] == account_name) & (df_filtered['is_xuni_block'] == 1)].groupby('created_at').size().reset_index(name='blocks')
+            xuni_account_blocks_df = df_filtered[(df_filtered['account'] == account_name) & (df_filtered['block_type'] == 'xuni')].groupby('created_at').size().reset_index(name='blocks')
             xuni_account_blocks_df['cumulative_blocks'] = xuni_account_blocks_df['blocks'].cumsum()
             plot_data(xuni_account_blocks_df, f'XUNI Blocks by Account: {account_name}')
+
         
         elif choice == '7':
             account_name = input("Enter the account name: ").lower()
-            superblocks_account_df = df[(df['account'] == account_name) & (df['is_super_block'] == 1)]  # Using original df here
+            superblocks_account_df = df[(df['account'] == account_name) & (df['block_type'] == 'super')].groupby('created_at').size().reset_index(name='blocks')
+            superblocks_account_df['cumulative_blocks'] = superblocks_account_df['blocks'].cumsum()
+            plot_data(superblocks_account_df, f'Superblocks by Account: {account_name}')
 
-            if superblocks_account_df.empty:
-                print(f"No superblocks found for account {account_name}.")
-            else:
-                superblocks_account_df = superblocks_account_df.groupby('created_at').size().reset_index(name='blocks')
-                superblocks_account_df['cumulative_blocks'] = superblocks_account_df['blocks'].cumsum()
-                plot_data(superblocks_account_df, f'Superblocks by Account: {account_name}')
 
         elif choice == '8':
             account_name = input("Enter the account name: ").lower()
@@ -145,64 +145,48 @@ def main():
             if filtered_df.empty:
                 print(f"No blocks found for account {account_name}.")
             else:
-                plt.hist(filtered_df['created_at'], bins=30, color='skyblue', edgecolor='black')
+                filtered_df['created_at'].dt.date.value_counts().sort_index().plot(kind='bar', color='skyblue', edgecolor='black')
                 plt.title(f'Daily Block Distribution for {account_name}')
                 plt.xlabel('Creation Date')
                 plt.ylabel('Frequency')
-                plt.gca().xaxis.set_major_formatter(mdates.DateFormatter('%m-%d'))
-                
-                auto_locator = AutoDateLocator(maxticks=10)
-                plt.gca().xaxis.set_major_locator(auto_locator)
-                
                 plt.gcf().autofmt_xdate()
                 plt.show()
 
         elif choice == '9':
             account_name = input("Enter the account name: ").lower()
-            filtered_df = df_filtered[(df_filtered['account'] == account_name) & (df_filtered['is_xuni_block'] == 1)]
+            filtered_df = df_filtered[(df_filtered['account'] == account_name) & (df_filtered['block_type'] == 'xuni')]
             
             if filtered_df.empty:
                 print(f"No XUNI blocks found for account {account_name}.")
             else:
-                plt.figure(figsize=(12, 7))
-                plt.hist(filtered_df['created_at'], bins=30, color='#ffcc99', edgecolor='black')
+                filtered_df['created_at'].dt.date.value_counts().sort_index().plot(kind='bar', color='#ffcc99', edgecolor='black')
                 plt.title(f'Daily XUNI Block Distribution for {account_name}')
                 plt.xlabel('Creation Date')
                 plt.ylabel('Frequency')
-                
-                # Modify date formatting and locator
-                plt.gca().xaxis.set_major_formatter(mdates.DateFormatter('%m-%d'))
-                auto_locator = AutoDateLocator(minticks=3, maxticks=7)  # Adjust the minticks and maxticks
-                plt.gca().xaxis.set_major_locator(auto_locator)
-                
                 plt.gcf().autofmt_xdate()
                 plt.show()
 
         elif choice == '10':
             account_name = input("Enter the account name: ").lower()
-            filtered_df = df[(df['account'] == account_name) & (df['is_super_block'] == 1)]  # Using original df here
+            filtered_df = df_filtered[(df_filtered['account'] == account_name) & (df_filtered['block_type'] == 'super')]
             
             if filtered_df.empty:
                 print(f"No superblocks found for account {account_name}.")
             else:
-                plt.hist(filtered_df['created_at'], bins=30, color='#99ff99', edgecolor='black')
+                filtered_df['created_at'].dt.date.value_counts().sort_index().plot(kind='bar', color='#99ff99', edgecolor='black')
                 plt.title(f'Daily Super Block Distribution for {account_name}')
                 plt.xlabel('Creation Date')
                 plt.ylabel('Frequency')
-                plt.gca().xaxis.set_major_formatter(mdates.DateFormatter('%m-%d'))
-                
-                auto_locator = AutoDateLocator(maxticks=10)
-                plt.gca().xaxis.set_major_locator(auto_locator)
-                
                 plt.gcf().autofmt_xdate()
                 plt.show()
 
         elif choice == '11':
-            plt.hist(df_filtered['created_at'], bins=30, color='skyblue', edgecolor='black')
+            # Assuming df is the original DataFrame
+            plt.hist(df[df['block_type'] != 'xuni']['created_at'], bins=30, color='skyblue', edgecolor='black')  # Exclude 'XUNI' blocks
             plt.title('Daily Blocks Distribution')
             plt.xlabel('Creation Date')
             plt.ylabel('Frequency')
-            plt.gca().xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m-%d'))  # Updated
+            plt.gca().xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m-%d'))
             
             auto_locator = AutoDateLocator(maxticks=10)
             plt.gca().xaxis.set_major_locator(auto_locator)
@@ -210,13 +194,14 @@ def main():
             plt.gcf().autofmt_xdate()
             plt.show()
 
+
         elif choice == '12':
-            xuni_blocks_df = df_filtered[df_filtered['is_xuni_block'] == 1]
+            xuni_blocks_df = df_filtered[df_filtered['block_type'] == 'xuni']
             plt.hist(xuni_blocks_df['created_at'], bins=30, color='#ffcc99', edgecolor='black')
             plt.title(f'Daily XUNI Blocks Distribution')
             plt.xlabel('Creation Date')
             plt.ylabel('Frequency')
-            plt.gca().xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m-%d'))  # Updated
+            plt.gca().xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m-%d'))
             
             auto_locator = AutoDateLocator(maxticks=10)
             plt.gca().xaxis.set_major_locator(auto_locator)
@@ -224,20 +209,20 @@ def main():
             plt.gcf().autofmt_xdate()
             plt.show()
 
-
         elif choice == '13':
-            super_blocks_df = df_filtered[df_filtered['is_super_block'] == 1]
+            super_blocks_df = df_filtered[df_filtered['block_type'] == 'super']
             plt.hist(super_blocks_df['created_at'], bins=30, color='#99ff99', edgecolor='black')
             plt.title(f'Daily Super Blocks Distribution')
             plt.xlabel('Creation Date')
             plt.ylabel('Frequency')
-            plt.gca().xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m-%d'))  # Updated
+            plt.gca().xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m-%d'))
             
             auto_locator = AutoDateLocator(maxticks=10)
             plt.gca().xaxis.set_major_locator(auto_locator)
             
             plt.gcf().autofmt_xdate()
             plt.show()
+
 
 
         elif choice == '14':
