@@ -1,70 +1,57 @@
-## XenBlocks Python Explorer and Chart Creator
+# XenBlocks Blockchain Tools
 
-XenBlocks Python Explorer is a comprehensive tool for exploring and visualizing XenBlocks blockchain data. It consists of three main Python scripts: `indexer.py`, `chaincheck.py`, and `chart.py`.
+## Overview
 
-This requires syncnode with a synchronized `blockchain.db`. The `indexer.py` will index `blockchain.db` and create a readable `blockchainindex.db`. Once `blockchainindex.db` is populated and has a good size, run `chaincheck.py` and `chart.py` from the same directory to gather and visualize data.
+XenBlocks Blockchain Tools is a suite of Python scripts meticulously crafted to interact, analyze, and visualize blockchain data. These scripts are designed to work seamlessly with the `blockchainindex.db` database. The suite comprises the following pivotal tools:
 
-## Features
+### 1. **indexer.py**
+This script reads data from the `blockchain.db` database and constructs an optimized, indexed version of the database, named `blockchainindex.db`. The creation of this indexed database is crucial as it serves as the backbone for `chart.py` and `explorer.py`, enabling them to exhibit charts and traverse blockchain data efficiently.
 
-- **Block Search**: Search for blocks by their ID.
-- **Account Search**: Search for accounts and get detailed information including total blocks and total super blocks.
-- **Last 10 Blocks**: View the last 10 blocks in the blockchain.
-- **Last 5 Super Blocks**: View the last 5 super blocks in the blockchain.
+### 2. **chart.py**
+Equipped with advanced visualization libraries, this script transforms blockchain data from the `blockchainindex.db` database into a plethora of insightful charts and graphs. It leverages libraries like `matplotlib` and `seaborn` to generate the following comprehensive charts:
+   - Total Network Blocks Over Time
+   - Total Network Super Blocks Over Time
+   - Total Network XUNI Blocks Over Time
+   - Total Network Distribution (Pie Chart)
+   - Blocks by Account
+   - XUNI Blocks by Account
+   - Superblocks by Account
+   - Daily Block Distribution for Account
+   - Daily XUNI Block Distribution for Account
+   - Daily Super Block Distribution for Account
+   - Daily Blocks Distribution
 
-- NEW: **Data Visualization**: Visualize blockchain data with different charts with charts.py
-
-## Prerequisites
-
-- Python 3.x
-- SQLite3
-- pandas
-- matplotlib
-
-## Installation
-
-Clone this repository to your local machine.
-
-```sh
-git clone https://github.com/YourUsername/XenBlocks-Python-Explorer.git
-```
+### 3. **explorer.py**
+Serving as an intuitive block explorer, this script allows users to delve deep into the blockchain data housed in the `blockchainindex.db` database. It provides a user-friendly interface to:
+   - Search for specific blocks by their ID
+   - Explore account statistics, including total blocks, XUNI blocks, and super blocks
+   - View the latest blocks
+   - Discover the top 20 total block holders
+   - Uncover the top 20 super block holders
+   - Identify the top 20 XUNI block holders
 
 ## Usage
 
-### Step 1: Build the Index Database
+### indexer.py
+Before leveraging the functionalities of `chart.py` and `explorer.py`, it is imperative to run `indexer.py` to index the blockchain data. This script fabricates the `blockchainindex.db` database, which is instrumental for the other scripts.
 
-Run the `indexer.py` script to build the index database (`blockchainindex.db`). Make sure you have `blockchain.db` (your blockchain data) available in the same directory.
+To utilize `indexer.py`, execute the script without any additional parameters.
 
-```sh
-python indexer.py
-```
+### chart.py
+To employ `chart.py`, invoke the script. It will render a menu enabling you to select from various charting options. Adhere to the on-screen directives to fabricate and view the desired charts.
 
-The script will continue running to index new blocks as they are added. Wait until the database is built before proceeding to the next step.
+### explorer.py
+To exploit `explorer.py`, execute the script and comply with the on-screen directives. You can probe for specific blocks by their ID, scrutinize account statistics, and more.
 
-### Step 2: Explore the Blockchain with chaincheck.py
+## Dependencies
 
-`chaincheck.py` allows you to explore the blockchain by searching for blocks by their ID, searching for accounts, viewing the last 10 blocks, and viewing the last 5 super blocks.
+The following Python libraries are essential for all scripts:
+- `sqlite3`: Essential for connecting to and querying the indexed database.
+- `pandas`: Crucial for data manipulation and analysis.
+- `matplotlib` and `seaborn`: Paramount for creating diverse charts and visualizations.
+- `tabulate`: Vital for rendering tabular data in a readable format.
+- `colorama`: Integral for enhancing the command-line interface with colors.
 
-```sh
-python chaincheck.py
-```
+## Acknowledgments
 
-Follow the on-screen prompts to navigate through the blockchain data.
-
-### Step 3: Visualize Blockchain Data with chart.py
-
-`chart.py` allows you to visualize the blockchain data with different charts, including total network blocks over time, total network super blocks over time, total blocks by account, and total superblocks by account.
-
-```sh
-python chart.py
-```
-
-Follow the on-screen prompts to select and display charts.
-
-## Contributing
-
-If you would like to contribute, please fork the repository and use a feature branch. Pull requests are warmly welcome.
-
-## License
-
-The code in this project is licensed under MIT license.
-```
+Developed with precision by TreeCityWes.eth. If you find these tools beneficial, please consider expressing your support by buying a coffee on HashHead.io.
