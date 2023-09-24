@@ -1,0 +1,5 @@
+# Required libraries for indexer.py and explorer.py
+sqlite3
+json
+tabulate
+colorama
