@@ -32,15 +32,18 @@ def search_by_accounts():
     cursor = conn.cursor()
     
     cursor.execute("""
-        SELECT COUNT(*), COUNT(CASE WHEN is_xuni_block = 1 THEN 1 END),
-               COUNT(CASE WHEN is_super_block = 1 THEN 1 END) 
+        SELECT COUNT(*), COUNT(CASE WHEN block_type = 'xuni' THEN 1 END),
+               COUNT(CASE WHEN block_type = 'super' THEN 1 END) 
         FROM blocks 
         WHERE account = ?
     """, (account,))
     result = cursor.fetchone()
-    block_count = result[0] if result else 0
+    block_count = result[0] if result else 0  # Total blocks including 'XUNI'
     xuni_block_count = result[1] if result else 0
     super_block_count = result[2] if result else 0
+    
+    # Subtract 'XUNI' blocks from total blocks
+    block_count -= xuni_block_count  # Now, block_count is the count of 'regular' and 'super' blocks only
     
     data = [['Account', account], ['Total Blocks', block_count], ['Total XUNI Blocks', xuni_block_count], ['Total Super Blocks', super_block_count]]
     display_table(data, ['Field', 'Value'])
@@ -54,11 +57,10 @@ def search_by_accounts():
         choice = input("Enter your choice: ")
         
         if choice == '1':
-            # Fetch and display the last 10 Regular Blocks
             cursor.execute("""
                 SELECT block_id, created_at
                 FROM blocks
-                WHERE account = ? AND is_xuni_block = 0 AND is_super_block = 0
+                WHERE account = ? AND block_type = 'regular'
                 ORDER BY created_at DESC
                 LIMIT 10
             """, (account,))
@@ -67,11 +69,10 @@ def search_by_accounts():
             display_table(results, ['Block ID', 'Timestamp'])
         
         elif choice == '2':
-            # Fetch and display the last 10 XUNI Blocks
             cursor.execute("""
                 SELECT block_id, created_at
                 FROM blocks
-                WHERE account = ? AND is_xuni_block = 1
+                WHERE account = ? AND block_type = 'xuni'
                 ORDER BY created_at DESC
                 LIMIT 10
             """, (account,))
@@ -80,11 +81,10 @@ def search_by_accounts():
             display_table(results, ['Block ID', 'Timestamp'])
         
         elif choice == '3':
-            # Fetch and display the last 10 Super Blocks
             cursor.execute("""
                 SELECT block_id, created_at
                 FROM blocks
-                WHERE account = ? AND is_super_block = 1
+                WHERE account = ? AND block_type = 'super'
                 ORDER BY created_at DESC
                 LIMIT 10
             """, (account,))
@@ -93,13 +93,12 @@ def search_by_accounts():
             display_table(results, ['Block ID', 'Timestamp'])
         
         elif choice == '4':
-            break  # Exit to the main menu
+            break
         
         else:
             print("\nInvalid choice. Please try again.\n")
     
     conn.close()
-
 
 def search_by_block_id():
     block_id = input("Enter the Block ID: ")
@@ -107,19 +106,20 @@ def search_by_block_id():
     cursor = conn.cursor()
     
     cursor.execute("""
-        SELECT block_id, account, created_at, is_super_block, is_xuni_block 
+        SELECT block_id, account, created_at, block_type 
         FROM blocks 
         WHERE block_id = ?
     """, (block_id,))
     result = cursor.fetchone()
     
     if result:
-        data = [['Block ID', result[0]], ['Miner', result[1]], ['Timestamp', result[2]], ['Type', 'Super Block' if result[3] else ('XUNI Block' if result[4] else 'Regular Block')]]
+        block_type = result[3].capitalize() + ' Block'  # Capitalize the block type and append ' Block'
+        data = [['Block ID', result[0]], ['Miner', result[1]], ['Timestamp', result[2]], ['Type', block_type]]
         display_table(data, ['Field', 'Value'])
     else:
         print("\nNo block found with the given ID.\n")
-    input("Press Enter to return to the main menu...")
     
+    input("Press Enter to return to the main menu...")
     conn.close()
 
 def show_top_blocks(block_type='all', top_n=20):
@@ -127,10 +127,10 @@ def show_top_blocks(block_type='all', top_n=20):
     cursor = conn.cursor()
     
     condition = ""
-    if block_type == 'super':
-        condition = "WHERE is_super_block = 1 "
-    elif block_type == 'xuni':
-        condition = "WHERE is_xuni_block = 1 "
+    if block_type == 'super' or block_type == 'xuni':
+        condition = f"WHERE block_type = '{block_type}' "
+    elif block_type == 'all':
+        condition = "WHERE block_type != 'xuni' "  # Exclude 'XUNI' blocks when block_type is 'all'
     
     query = f"""
         SELECT account, COUNT(*) AS count 
@@ -142,26 +142,24 @@ def show_top_blocks(block_type='all', top_n=20):
     cursor.execute(query)
     results = cursor.fetchall()
     
-    # Add ranking to the results
     ranked_results = [[rank + 1, account, count] for rank, (account, count) in enumerate(results)]
     
     headers = ['Rank', 'Account', 'Count']
     title = f"Top {top_n} {block_type.title()} Block Holders" if block_type != 'all' else f"Top {top_n} Total Block Holders"
     display_table(ranked_results, headers, title)
-    input("Press Enter to return to the main menu...")
     
+    input("Press Enter to return to the main menu...")
     conn.close()
+
 
 def show_last_blocks(block_type='all', last_n=10):
     conn = sqlite3.connect("blockchainindex.db")
     cursor = conn.cursor()
     
     condition = ""
-    if block_type == 'super':
-        condition = "WHERE is_super_block = 1 "
-    elif block_type == 'xuni':
-        condition = "WHERE is_xuni_block = 1 "
-        
+    if block_type == 'super' or block_type == 'xuni':
+        condition = f"WHERE block_type = '{block_type}' "
+    
     query = f"""
         SELECT block_id, account, created_at 
         FROM blocks {condition}
@@ -174,9 +172,10 @@ def show_last_blocks(block_type='all', last_n=10):
     headers = ['Block ID', 'Account', 'Timestamp']
     title = f"Last {last_n} {block_type.title()} Blocks" if block_type != 'all' else f"Last {last_n} Blocks"
     display_table(results, headers, title)
-    input("Press Enter to return to the main menu...")
     
+    input("Press Enter to return to the main menu...")
     conn.close()
+
 
 def main_menu():
     while True:
