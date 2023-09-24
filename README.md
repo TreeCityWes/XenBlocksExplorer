@@ -2,13 +2,13 @@
 
 ## Overview
 
-XenBlocks Blockchain Tools is a suite of Python scripts meticulously crafted to interact, analyze, and visualize blockchain data. These scripts are designed to work seamlessly with the `blockchainindex.db` database. The suite comprises the following pivotal tools:
+XenBlocks Blockchain Tools is a suite of Python scripts crafted to interact, analyze, and visualize blockchain data. These scripts are designed to work seamlessly with the `blockchainindex.db` database. The suite comprises the following pivotal tools:
 
 ### 1. **indexer.py**
-This script reads data from the `blockchain.db` database and constructs an optimized, indexed version of the database, named `blockchainindex.db`. The creation of this indexed database is crucial as it serves as the backbone for `chart.py` and `explorer.py`, enabling them to exhibit charts and traverse blockchain data efficiently.
+This script reads data from the `blockchain.db` database and constructs an optimized, indexed version of the database, named `blockchainindex.db`. The creation of this indexed serves as the backbone for `chart.py` and `explorer.py`, enabling them to show charts and blockchain data efficiently.
 
 ### 2. **chart.py**
-Equipped with advanced visualization libraries, this script transforms blockchain data from the `blockchainindex.db` database into a plethora of insightful charts and graphs. It leverages libraries like `matplotlib` and `seaborn` to generate the following comprehensive charts:
+Chart.py transforms blockchain data from the `blockchainindex.db` database into charts and graphs. It leverages libraries like `matplotlib` and `seaborn` to generate the following charts:
    - Total Network Blocks Over Time
    - Total Network Super Blocks Over Time
    - Total Network XUNI Blocks Over Time
@@ -22,7 +22,7 @@ Equipped with advanced visualization libraries, this script transforms blockchai
    - Daily Blocks Distribution
 
 ### 3. **explorer.py**
-Serving as an intuitive block explorer, this script allows users to delve deep into the blockchain data housed in the `blockchainindex.db` database. It provides a user-friendly interface to:
+Serving as an block explorer within a python script, this script allows users to delve deep into the data in the `blockchainindex.db` database. It provides a user-friendly interface to:
    - Search for specific blocks by their ID
    - Explore account statistics, including total blocks, XUNI blocks, and super blocks
    - View the latest blocks
@@ -33,15 +33,15 @@ Serving as an intuitive block explorer, this script allows users to delve deep i
 ## Usage
 
 ### indexer.py
-Before leveraging the functionalities of `chart.py` and `explorer.py`, it is imperative to run `indexer.py` to index the blockchain data. This script fabricates the `blockchainindex.db` database, which is instrumental for the other scripts.
+Before leveraging the functionalities of `chart.py` and `explorer.py`, please run `indexer.py` to index the blockchain data. This script creates the `blockchainindex.db` database, which is required for the other scripts.
 
-To utilize `indexer.py`, execute the script without any additional parameters.
+To run `indexer.py`, execute the script without any additional parameters.
 
 ### chart.py
-To employ `chart.py`, invoke the script. It will render a menu enabling you to select from various charting options. Adhere to the on-screen directives to fabricate and view the desired charts.
+To run `chart.py`, execute the script. It will render a menu enabling you to select from various charting options.
 
 ### explorer.py
-To exploit `explorer.py`, execute the script and comply with the on-screen directives. You can probe for specific blocks by their ID, scrutinize account statistics, and more.
+To run `explorer.py`, execute the script and comply with the on-screen options. 
 
 ## Dependencies
 
@@ -54,4 +54,4 @@ The following Python libraries are essential for all scripts:
 
 ## Acknowledgments
 
-Developed with precision by TreeCityWes.eth. If you find these tools beneficial, please consider expressing your support by buying a coffee on HashHead.io.
+Developed with precision by TreeCityWes.eth. If you find these tools useful, please consider expressing your support by buying a coffee on HashHead.io.
