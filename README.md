@@ -2,7 +2,7 @@
 
 ## Overview
 
-XenBlocks Blockchain Tools is a suite of Python scripts crafted to interact, analyze, and visualize blockchain data. These scripts are designed to work seamlessly with the `blockchainindex.db` database. The suite comprises the following pivotal tools:
+XenBlocks Blockchain Tools is a suite of Python scripts crafted to interact, analyze, and visualize blockchain data. Run SyncNode to create the XenBlocks blockchain.db file. The indexer.py will index blockchain.db and create blockchainindex.db. Chart.py and Explorer.py scripts are designed to work seamlessly with the `blockchainindex.db` database. 
 
 ### 1. **indexer.py**
 This script reads data from the `blockchain.db` database and constructs an optimized, indexed version of the database, named `blockchainindex.db`. The creation of this indexed serves as the backbone for `chart.py` and `explorer.py`, enabling them to show charts and blockchain data efficiently.
