@@ -13,8 +13,7 @@ def create_tables(cursor):
         account TEXT,
         xuni_account TEXT,
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-        is_super_block INTEGER DEFAULT 0,
-        is_xuni_block INTEGER DEFAULT 0
+        block_type TEXT DEFAULT 'regular'
     )
     """)
     cursor.execute("""
@@ -52,17 +51,26 @@ def main():
                 account = item.get("account")
                 xuni_account = item.get("xuni_account", "")
                 created_at = item.get("date")
-                is_super_block = 1 if count_uppercase_letters(hash_to_verify) >= 65 else 0
-                is_xuni_block = 1 if item.get("xuni_id") is not None else 0
                 
-                all_values.append((hash_to_verify, key, account, xuni_account, created_at, is_super_block, is_xuni_block))
+                is_xuni_block = item.get("xuni_id") is not None
+                is_super_block = count_uppercase_letters(hash_to_verify) >= 65  # Super block condition
+                
+                # Default block type is regular, unless it's a Xuni block or Super block
+                if is_xuni_block:
+                    block_type = 'xuni'
+                elif is_super_block:
+                    block_type = 'super'
+                else:
+                    block_type = 'regular'
+                
+                all_values.append((hash_to_verify, key, account, xuni_account, created_at, block_type))
                 
                 if is_super_block:
                     index_cursor.execute("""
                     INSERT OR IGNORE INTO super_blocks (account, super_block_count)
                     VALUES (?, 0);
                     """, (account,))
-
+                    
                     index_cursor.execute("""
                     UPDATE super_blocks
                     SET super_block_count = super_block_count + 1
@@ -70,8 +78,8 @@ def main():
                     """, (account,))
                     
             index_cursor.executemany("""
-            INSERT OR IGNORE INTO blocks (hash_to_verify, key, account, xuni_account, created_at, is_super_block, is_xuni_block)
-            VALUES (?, ?, ?, ?, ?, ?, ?)
+            INSERT OR IGNORE INTO blocks (hash_to_verify, key, account, xuni_account, created_at, block_type)
+            VALUES (?, ?, ?, ?, ?, ?)
             """, all_values)
             
             processed_records += len(all_values)
