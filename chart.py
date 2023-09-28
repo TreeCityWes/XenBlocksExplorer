@@ -4,23 +4,22 @@ import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
 from matplotlib.dates import AutoDateLocator
 import seaborn as sns
-from colorama import Fore, Style  # Import the necessary modules from Colorama
+from colorama import Fore, Style
 
 sns.set_theme(style="darkgrid")
 
 def display_banner():
     banner = """
-██╗░░██╗███████╗███╗░░██╗  ██████╗░██╗░░░░░░█████╗░░█████╗░██╗░░██╗░██████╗
-╚██╗██╔╝██╔════╝████╗░██║  ██╔══██╗██║░░░░░██╔══██╗██╔══██╗██║░██╔╝██╔════╝
-░╚███╔╝░█████╗░░██╔██╗██║  ██████╦╝██║░░░░░██║░░██║██║░░╚═╝█████═╝░╚█████╗░
-░██╔██╗░██╔══╝░░██║╚████║  ██╔══██╗██║░░░░░██║░░██║██║░░██╗██╔═██╗░░╚═══██╗
-██╔╝╚██╗███████╗██║░╚███║  ██████╦╝███████╗╚█████╔╝╚█████╔╝██║░╚██╗██████╔╝
-╚═╝░░╚═╝╚══════╝╚═╝░░╚══╝  ╚═════╝░╚══════╝░╚════╝░░╚════╝░╚═╝░░╚═╝╚═════╝░
-    XenBlocks Python Chart Creator by TreeCityWes.eth
-    Buy Me A Coffee on HashHead.io 
+    ██╗░░██╗███████╗███╗░░██╗  ██████╗░██╗░░░░░░█████╗░░█████╗░██╗░░██╗░██████╗
+    ╚██╗██╔╝██╔════╝████╗░██║  ██╔══██╗██║░░░░░██╔══██╗██╔══██╗██║░██╔╝██╔════╝
+    ░╚███╔╝░█████╗░░██╔██╗██║  ██████╦╝██║░░░░░██║░░██║██║░░╚═╝█████═╝░╚█████╗░
+    ░██╔██╗░██╔══╝░░██║╚████║  ██╔══██╗██║░░░░░██║░░██║██║░░██╗██╔═██╗░░╚═══██╗
+    ██╔╝╚██╗███████╗██║░╚███║  ██████╦╝███████╗╚█████╔╝╚█████╔╝██║░╚██╗██████╔╝
+    ╚═╝░░╚═╝╚══════╝╚═╝░░╚══╝  ╚═════╝░╚══════╝░╚════╝░░╚════╝░╚═╝░░╚═╝╚═════╝░
+        XenBlocks Python Block Explorer by TreeCityWes.eth
+        Buy Me A Coffee on HashHead.io 
     """
-    print(Fore.LIGHTGREEN_EX + banner + Style.RESET_ALL)  # Use colorama to color the banner lime green
-
+    print(Fore.LIGHTGREEN_EX + banner + Style.RESET_ALL)
 
 def plot_data(df, title):
     if df.empty:
@@ -45,6 +44,17 @@ print("Data loaded successfully!")
 
 df['created_at'] = pd.to_datetime(df['created_at'])
 df['account'] = df['account'].str.lower()
+
+# Filter the DataFrame to only include rows where 'created_at' is after September 20th
+start_date = '2023-09-15'  # Assuming YYYY-MM-DD format
+df = df[df['created_at'] > start_date]
+
+def display_menu():
+    display_banner()
+    print("\nPlease choose a chart to display:")
+    print("Network Statistics:")
+    # ... (other menu items remain unchanged)
+    return input("Your choice: ")
 
 def display_menu():
     # Assuming display_banner() is a function you have defined elsewhere in your script
@@ -90,6 +100,7 @@ def main():
             plot_data(superblocks_df, 'Total Network Super Blocks Over Time')
 
 
+
         elif choice == '3':
             xuni_blocks_df = df[df['block_type'] == 'xuni'].groupby('created_at').size().reset_index(name='blocks')
             xuni_blocks_df['cumulative_blocks'] = xuni_blocks_df['blocks'].cumsum()
@@ -102,21 +113,27 @@ def main():
             super_block_count = block_counts.get('super', 0)
             xuni_block_count = block_counts.get('xuni', 0)
             
-            # If XUNI blocks are not counted in total blocks
-            total_blocks = regular_block_count + super_block_count  # XUNI blocks are not included in total_blocks
+            total_blocks = regular_block_count + super_block_count + xuni_block_count
             regular_block_percentage = (regular_block_count / total_blocks) * 100
             super_block_percentage = (super_block_count / total_blocks) * 100
+            xuni_block_percentage = (xuni_block_count / total_blocks) * 100
             
-            plt.pie([regular_block_count, super_block_count],
-                    labels=['', ''], autopct='',
-                    startangle=140, colors=['#66b3ff', '#99ff99'])
-            plt.axis('equal')
-            plt.title('Ratio of Blocks and Superblocks', fontsize=16, loc='center')
-            legend_labels = [f'Regular Blocks - {regular_block_percentage:.1f}%', f'Superblocks - {super_block_percentage:.1f}%']
+            plt.pie([regular_block_count, super_block_count, xuni_block_count],
+                    labels=['Regular Blocks', 'Super Blocks', 'XUNI Blocks'], 
+                    autopct='%1.1f%%',
+                    startangle=140, 
+                    colors=['#66b3ff', '#99ff99', '#ffcc99'])
+            plt.axis('equal')  # Equal aspect ratio ensures that pie is drawn as a circle.
+            plt.title('Distribution of Block Types', fontsize=16)
+            legend_labels = [
+                f'Regular Blocks - {regular_block_percentage:.1f}%', 
+                f'Superblocks - {super_block_percentage:.1f}%',
+                f'XUNI Blocks - {xuni_block_percentage:.1f}%'
+            ]
             legend = plt.legend(loc='upper left', labels=legend_labels)
             legend.get_frame().set_alpha(1.0)
-            
             plt.show()
+
 
         elif choice == '5':
             account_name = input("Enter the account name: ").lower()
@@ -140,7 +157,7 @@ def main():
 
         elif choice == '8':
             account_name = input("Enter the account name: ").lower()
-            filtered_df = df_filtered[df_filtered['account'] == account_name]
+            filtered_df = df_filtered[(df_filtered['account'] == account_name) & (df_filtered['created_at'] >= '2023-09-17')]
             
             if filtered_df.empty:
                 print(f"No blocks found for account {account_name}.")
@@ -152,9 +169,10 @@ def main():
                 plt.gcf().autofmt_xdate()
                 plt.show()
 
+
         elif choice == '9':
             account_name = input("Enter the account name: ").lower()
-            filtered_df = df_filtered[(df_filtered['account'] == account_name) & (df_filtered['block_type'] == 'xuni')]
+            filtered_df = df_filtered[(df_filtered['account'] == account_name) & (df_filtered['block_type'] == 'xuni') & (df_filtered['created_at'] >= '2023-09-17')]
             
             if filtered_df.empty:
                 print(f"No XUNI blocks found for account {account_name}.")
@@ -168,7 +186,7 @@ def main():
 
         elif choice == '10':
             account_name = input("Enter the account name: ").lower()
-            filtered_df = df_filtered[(df_filtered['account'] == account_name) & (df_filtered['block_type'] == 'super')]
+            filtered_df = df_filtered[(df_filtered['account'] == account_name) & (df_filtered['block_type'] == 'super') & (df_filtered['created_at'] >= '2023-09-17')]
             
             if filtered_df.empty:
                 print(f"No superblocks found for account {account_name}.")
@@ -180,50 +198,54 @@ def main():
                 plt.gcf().autofmt_xdate()
                 plt.show()
 
+
         elif choice == '11':
-            # Assuming df is the original DataFrame
-            plt.hist(df[df['block_type'] != 'xuni']['created_at'], bins=30, color='skyblue', edgecolor='black')  # Exclude 'XUNI' blocks
+            # Set the start date
+            start_date = pd.to_datetime('2023-09-17')
+            
+            # Filter the DataFrame to include only records after the start date
+            filtered_df = df[(df['block_type'] != 'xuni') & (df['created_at'] >= start_date)]
+            
+            # Extract date from datetime and group by the date to get the counts
+            filtered_df['created_at'].dt.date.value_counts().sort_index().plot(kind='bar', color='skyblue', edgecolor='black')
+            
             plt.title('Daily Blocks Distribution')
             plt.xlabel('Creation Date')
             plt.ylabel('Frequency')
-            plt.gca().xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m-%d'))
-            
-            auto_locator = AutoDateLocator(maxticks=10)
-            plt.gca().xaxis.set_major_locator(auto_locator)
-            
-            plt.gcf().autofmt_xdate()
+            plt.gcf().autofmt_xdate()  # Auto format the date on the x-axis for better readability
             plt.show()
 
-
         elif choice == '12':
-            xuni_blocks_df = df_filtered[df_filtered['block_type'] == 'xuni']
-            plt.hist(xuni_blocks_df['created_at'], bins=30, color='#ffcc99', edgecolor='black')
-            plt.title(f'Daily XUNI Blocks Distribution')
+            # Set the start date
+            start_date = pd.to_datetime('2023-09-17')
+            
+            # Filter the DataFrame to include only records after the start date and where block_type is 'xuni'
+            filtered_df = df[(df['block_type'] == 'xuni') & (df['created_at'] >= start_date)]
+            
+            # Extract date from datetime and group by the date to get the counts
+            filtered_df['created_at'].dt.date.value_counts().sort_index().plot(kind='bar', color='#ffcc99', edgecolor='black')
+            
+            plt.title('Daily XUNI Block Distribution')
             plt.xlabel('Creation Date')
             plt.ylabel('Frequency')
-            plt.gca().xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m-%d'))
-            
-            auto_locator = AutoDateLocator(maxticks=10)
-            plt.gca().xaxis.set_major_locator(auto_locator)
-            
-            plt.gcf().autofmt_xdate()
+            plt.gcf().autofmt_xdate()  # Auto format the date on the x-axis for better readability
             plt.show()
 
         elif choice == '13':
-            super_blocks_df = df_filtered[df_filtered['block_type'] == 'super']
-            plt.hist(super_blocks_df['created_at'], bins=30, color='#99ff99', edgecolor='black')
-            plt.title(f'Daily Super Blocks Distribution')
+            # Set the start date
+            start_date = pd.to_datetime('2023-09-17')
+            
+            # Filter the DataFrame to include only records after the start date and where block_type is 'super'
+            filtered_df = df[(df['block_type'] == 'super') & (df['created_at'] >= start_date)]
+            
+            # Extract date from datetime and group by the date to get the counts
+            filtered_df['created_at'].dt.date.value_counts().sort_index().plot(kind='bar', color='#99ff99', edgecolor='black')
+            
+            plt.title('Daily Super Block Distribution')
             plt.xlabel('Creation Date')
             plt.ylabel('Frequency')
-            plt.gca().xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m-%d'))
-            
-            auto_locator = AutoDateLocator(maxticks=10)
-            plt.gca().xaxis.set_major_locator(auto_locator)
-            
-            plt.gcf().autofmt_xdate()
+            plt.gcf().autofmt_xdate()  # Auto format the date on the x-axis for better readability
             plt.show()
-
-
 
         elif choice == '14':
             print("Exiting. Goodbye!")
